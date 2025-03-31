@@ -16,6 +16,11 @@
 - Docker commands should be executed in the remote Ubuntu context
 - SSH is used to connect from Windows to the remote system
 
+### Development
+- **Development**: Docker Compose-based local environment
+- **Production**: TBD (AWS/GCP/Azure)
+- **CI/CD**: GitHub Actions
+
 ## Core Technology Stack
 
 ### Backend
@@ -151,4 +156,15 @@
 - Frontend performance optimization
 - Mobile responsiveness
 - Accessibility compliance
-- UI consistency with B2B Starter 
+- UI consistency with B2B Starter
+
+## Docker Compose Configuration
+- **Services**:
+  - `medusa-server`: Backend API service
+  - `postgres`: PostgreSQL database
+  - `redis`: Redis cache
+  - `storefront`: Next.js frontend
+  - `admin`: Medusa admin dashboard
+- **Networks**: Internal Docker network for service communication
+- **Volumes**: Persistent storage for database and cache
+- **Environment Variables**: Managed through .env files 

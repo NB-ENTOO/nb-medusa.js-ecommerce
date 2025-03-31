@@ -1,0 +1,14 @@
+{
+  "name": "medusa-admin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "medusa-admin start",
+    "build": "medusa-admin build",
+    "start": "medusa-admin start"
+  },
+  "dependencies": {
+    "@medusajs/admin": "^7.1.1",
+    "@medusajs/medusa": "^1.19.0"
+  }
+} 

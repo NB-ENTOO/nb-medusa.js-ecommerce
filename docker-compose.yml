@@ -1,0 +1,90 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "9000:9000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgres://medusa:medusa@postgres:5432/medusa_store
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=supersecret
+      - COOKIE_SECRET=supersecret
+      - STORE_CORS=http://localhost:8000
+      - ADMIN_CORS=http://localhost:9000
+      - AUTH_CORS=http://localhost:9000
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - medusa-network
+
+  storefront:
+    build:
+      context: ./storefront
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://localhost:9000
+      - NODE_ENV=development
+    volumes:
+      - ./storefront:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - medusa-network
+
+  admin:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile
+    ports:
+      - "7000:7000"
+    environment:
+      - MEDUSA_BACKEND_URL=http://localhost:9000
+      - NODE_ENV=development
+    volumes:
+      - ./admin:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - medusa-network
+
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=medusa
+      - POSTGRES_PASSWORD=medusa
+      - POSTGRES_DB=medusa_store
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - medusa-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - medusa-network
+
+networks:
+  medusa-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data: 

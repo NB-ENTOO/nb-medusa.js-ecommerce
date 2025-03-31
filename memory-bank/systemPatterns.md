@@ -122,6 +122,44 @@ class CompatibilityService {
 }
 ```
 
+## Docker Compose Patterns
+- **Service Definition Pattern**:
+  ```yaml
+  services:
+    service-name:
+      build:
+        context: ./path
+        dockerfile: Dockerfile
+      environment:
+        - KEY=value
+      depends_on:
+        - other-service
+      volumes:
+        - ./local:/container
+      networks:
+        - app-network
+  ```
+
+- **Network Pattern**:
+  ```yaml
+  networks:
+    app-network:
+      driver: bridge
+  ```
+
+- **Volume Pattern**:
+  ```yaml
+  volumes:
+    data:
+      driver: local
+  ```
+
+- **Environment Pattern**:
+  ```yaml
+  env_file:
+    - .env
+  ```
+
 ## Frontend Design Patterns
 
 ### Layout Components
