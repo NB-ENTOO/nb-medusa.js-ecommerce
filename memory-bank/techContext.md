@@ -1,4 +1,4 @@
-# Medusa.js E-Commerce Technical Context
+# Enterprise Equipment Configuration Platform Technical Context
 
 ## Deployment Environment
 
@@ -8,6 +8,7 @@
 - **Containerization**: Docker installed on the remote Ubuntu system
 - **Connection**: Files are accessed remotely from Windows to the Ubuntu host
 - **Path Structure**: Remote path is `/home/admin/docker`
+- **Reference Implementation**: B2B Starter located in `/medusa/reference files/b2b-starter-medusa-main reference/`
 
 ### Command Adaptation
 - Commands should be written for Ubuntu/Linux environment
@@ -18,13 +19,16 @@
 ## Core Technology Stack
 
 ### Backend
-- **Medusa.js**: Headless commerce engine (Node.js)
+- **Medusa.js**: Base platform (Node.js)
 - **Express**: Web server framework
 - **PostgreSQL**: Primary database
 - **Redis**: Caching and queue processing
 - **TypeScript**: Type-safe JavaScript
 - **REST API**: Primary interface for service interactions
 - **JWT**: Authentication mechanism
+- **PDFKit/React-PDF**: PDF generation
+- **NodeMailer/SendGrid**: Email delivery
+- **Compatibility Engine**: Component validation system
 
 ### Frontend
 - **React.js**: UI framework
@@ -32,8 +36,40 @@
 - **Tailwind CSS**: Utility-first CSS framework
 - **React Query**: Data fetching and caching
 - **Redux/Context API**: State management
-- **Medusa React**: Official React hooks for Medusa
-- **Medusa Admin**: Admin dashboard interface
+- **React-PDF**: PDF generation in browser
+- **Component Library**: Enterprise UI components
+- **Technical Spec Renderer**: Specification display
+- **Design System**: Based on B2B Starter
+  - Clean, modern interface
+  - Responsive grid layouts
+  - Component-based architecture
+  - Consistent typography
+  - Enterprise-grade UI patterns
+
+### UI Component Structure
+1. **Layout Components** (from B2B Starter)
+   - Header with navigation
+   - Footer with links
+   - Sidebar for configuration
+   - Main content area
+   - Modal dialogs
+   - Toast notifications
+
+2. **Feature Components** (adapted for ETB functionality)
+   - Component selector
+   - Configuration wizard
+   - Technical spec viewer
+   - Price calculator
+   - Compatibility checker
+   - Quotation form
+
+3. **Common Components** (from B2B Starter)
+   - Buttons
+   - Forms
+   - Cards
+   - Tables
+   - Loading states
+   - Error messages
 
 ### DevOps & Tooling
 - **Docker**: Containerization
@@ -41,34 +77,65 @@
 - **NPM/Yarn**: Package management
 - **ESLint/Prettier**: Code quality tools
 - **Jest**: Testing framework
+- **PDF Testing**: PDF generation validation
+- **Email Testing**: Email delivery testing
 
-## Medusa.js Architecture
+## System Architecture
 
 ### Core Components
 - **API Layer**: REST API endpoints
-- **Services**: Business logic implementation
-- **Models**: Data structure definitions
-- **Repositories**: Database interaction
-- **Subscribers**: Event handling
-- **Strategies**: Pluggable implementation patterns
-- **Loaders**: Module initialization
-- **Plugins**: Extensibility modules
+- **Configuration Engine**: Component configuration logic
+- **Compatibility Engine**: Component validation system
+- **Pricing Engine**: Dynamic price calculation
+- **PDF Generator**: Technical specification PDFs
+- **Email Service**: Sales team notification
+- **Component Management**: Component catalog system
+- **Technical Spec Generator**: Specification creation
+
+### Frontend Architecture
+- **Layout Components**
+  - Header with navigation
+  - Footer with links
+  - Sidebar for configuration
+  - Main content area
+  - Modal dialogs
+  - Toast notifications
+
+- **Feature Components**
+  - Component selector
+  - Configuration wizard
+  - Technical spec viewer
+  - Price calculator
+  - Compatibility checker
+  - Quotation form
+
+- **Design Patterns**
+  - Card-based layouts
+  - Grid systems
+  - Responsive breakpoints
+  - Loading states
+  - Error handling
+  - Form validation
 
 ### Key Concepts
-- **Entities**: Products, Variants, Orders, Customers, etc.
-- **Services**: Core business logic modules
-- **Plugins**: Extensions for payment, shipping, notifications, etc.
-- **Events**: System for handling asynchronous operations
-- **Migrations**: Database structure management
-- **Customization**: Override capabilities at multiple levels
+- **Components**: Server parts, enterprise equipment
+- **Configurations**: Component combinations
+- **Compatibility Rules**: Component interaction rules
+- **Technical Specifications**: System requirements
+- **Pricing Models**: Dynamic pricing calculations
+- **Quotations**: Generated technical proposals
+- **Email Templates**: Sales notification formats
 
 ## Development Setup
 - NodeJS version >=16.0.0
 - PostgreSQL instance
 - Redis instance (optional, but recommended)
 - Medusa CLI
-- Database migration tools
+- PDF generation tools
+- Email service configuration
+- Component catalog management
 - Environment configuration
+- B2B Starter reference implementation
 
 ## Operational Requirements
 - Regular database backups
@@ -76,4 +143,12 @@
 - Proper API authentication
 - Rate limiting for public endpoints
 - Secure environment variable management
-- Payment processor security compliance 
+- PDF generation optimization
+- Email delivery reliability
+- Component catalog updates
+- Technical specification accuracy
+- Compatibility rule validation
+- Frontend performance optimization
+- Mobile responsiveness
+- Accessibility compliance
+- UI consistency with B2B Starter 

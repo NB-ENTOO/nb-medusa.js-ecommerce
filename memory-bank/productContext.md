@@ -1,34 +1,56 @@
-# Medusa.js E-Commerce Product Context
+# Enterprise Equipment Configuration Platform Product Context
 
 ## Business Purpose
-This e-commerce platform addresses the need for a flexible, customizable online retail solution with modern architecture and feature set. Medusa.js provides the foundation for a headless commerce experience that separates the frontend and backend concerns.
+This specialized e-commerce platform addresses the need for enterprise-grade equipment configuration and quotation generation. Inspired by ETB Technologies, it provides a sophisticated system for customers to configure complex server and enterprise equipment, generating detailed quotations that are automatically forwarded to sales teams.
 
 ## Problem Space
-Traditional e-commerce platforms often:
-- Lack flexibility for custom business logic
-- Have tightly coupled frontend and backend
-- Restrict integration with third-party services
-- Present scaling challenges as business grows
-- Limit customization of the shopping experience
+Traditional enterprise equipment sales often:
+- Require manual quotation processes
+- Lack real-time component compatibility checking
+- Have complex pricing calculations
+- Need extensive technical knowledge for configuration
+- Suffer from slow quotation turnaround times
+- Struggle with maintaining up-to-date component catalogs
 
 ## Target Users
-1. **Online Retailers** - Businesses selling physical products online
-2. **Development Teams** - Looking for a customizable e-commerce solution
-3. **Store Administrators** - Managing products, orders, and customers
-4. **Customers** - End users shopping on the platform
+1. **Enterprise Customers**
+   - IT departments configuring servers
+   - System integrators
+   - Technical decision makers
+   - Procurement teams
+
+2. **Sales Team**
+   - Receiving and processing quotations
+   - Following up with customers
+   - Managing customer inquiries
+   - Tracking quotation status
+
+3. **Administrators**
+   - Managing product catalog
+   - Updating component specifications
+   - Maintaining pricing
+   - Managing configuration templates
+
+4. **Technical Users**
+   - System architects
+   - IT consultants
+   - Technical evaluators
 
 ## Key Differentiators
-- **Headless Architecture** - Complete separation of frontend and backend
-- **API-First Approach** - All functionality accessible via API
-- **Plugin System** - Extensible with custom and third-party plugins
-- **Developer Experience** - Built with modern JavaScript technologies
-- **Open Source** - Community-driven development with MIT license
-- **Customization** - Fully adaptable to unique business requirements
+- **Interactive Configuration** - Real-time component selection and validation
+- **Automated Quotation** - Instant PDF generation and email delivery
+- **Technical Focus** - Detailed specifications and compatibility checking
+- **Enterprise-Grade** - Focus on server and enterprise equipment
+- **Sales Integration** - Direct connection to sales team workflow
+- **Component-Based** - Flexible product configuration system
 
 ## Success Metrics
-- Seamless product management workflow
-- Fast and intuitive checkout process
-- Reliable order processing and fulfillment
-- Comprehensive customer profiles and history
-- Flexible shipping and payment options
-- Robust admin controls and reporting 
+- Accurate and complete quotations
+- Reduced quotation turnaround time
+- High configuration accuracy
+- Customer satisfaction with interface
+- Sales team efficiency
+- Technical specification accuracy
+- Component compatibility validation
+- Mobile responsiveness
+- System performance and reliability 
