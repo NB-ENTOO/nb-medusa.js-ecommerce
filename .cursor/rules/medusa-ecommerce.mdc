@@ -1,0 +1,266 @@
+---
+description: Medusa.js E-Commerce specific rules and guidelines
+globs: 
+alwaysApply: true
+---
+
+# 🛒 MEDUSA.JS E-COMMERCE ASSISTANT
+
+> This file extends the core Adaptive Memory Bank system with specific guidelines for Medusa.js e-commerce development. It provides specialized approaches for headless commerce implementation following Medusa.js patterns and best practices.
+
+## 🚨 INTEGRATION WITH MEDUSA DOCUMENTATION
+
+This file works in conjunction with the comprehensive `llms-medusa.mdc` file, which contains the full Medusa.js documentation. For detailed information on specific Medusa topics, refer to the following sections in `llms-medusa.mdc`:
+
+- **Installation & Setup**: "Install Medusa" section
+- **Architecture**: "Medusa's Architecture" section
+- **Configuration**: "Medusa Application Configuration" section
+- **Development**: "Build Custom Features" section
+- **Admin Dashboard**: "Admin Development" section
+- **UI Components**: Various UI component sections at the end
+- **Deployment**: "Medusa Deployment Overview" section
+
+## 🚨 MEDUSA.JS ARCHITECTURAL PRINCIPLES
+
+When working with Medusa.js, adhere to these core architectural principles:
+
+1. **Headless Architecture** - Keep frontend and backend concerns strictly separated
+2. **Service-Based Design** - Implement business logic in focused service classes
+3. **Repository Pattern Usage** - Abstract database operations through repositories
+4. **Event-Driven Communication** - Use events for cross-service communication
+5. **Plugin-Based Extension** - Extend functionality through the plugin system
+6. **Entity Relationships** - Understand complex relationships between entities
+7. **Strategy Pattern Implementation** - Use strategies for interchangeable implementations
+
+## 🚨 MEDUSA.JS FILE ORGANIZATION
+
+Follow these patterns when organizing Medusa-specific files:
+
+### Backend Structure
+```
+src/
+├── api/
+│   ├── routes/
+│   └── middlewares/
+├── models/
+│   └── [entity-name].ts
+├── services/
+│   └── [service-name].ts
+├── repositories/
+│   └── [repository-name].ts
+├── migrations/
+│   └── [timestamp]-[migration-name].ts
+├── subscribers/
+│   └── [subscriber-name].ts
+└── loaders/
+    └── [loader-name].ts
+```
+
+### Frontend Structure
+```
+src/
+├── pages/
+│   ├── products/
+│   ├── cart/
+│   ├── checkout/
+│   └── account/
+├── components/
+│   ├── common/
+│   ├── products/
+│   ├── cart/
+│   └── checkout/
+├── hooks/
+│   └── [hook-name].ts
+├── context/
+│   └── [context-name].tsx
+├── utils/
+│   └── [utility-name].ts
+└── styles/
+    └── [style-name].css
+```
+
+## 🚨 MEDUSA.JS PROJECT COMPONENTS
+
+As outlined in the llms-medusa.mdc documentation, a standard Medusa project consists of:
+
+1. **Medusa Application**:
+   - Medusa Server (core API)
+   - Medusa Admin Dashboard
+
+2. **One or More Storefronts**:
+   - Can be built using various technologies
+   - Connects to the Medusa Server through its APIs
+
+Deployment considerations:
+- The Medusa application (server + admin) is deployed separately from the storefront
+- The Medusa application must be deployed before the storefront
+- The deployment requires Node.js hosting support
+
+## 🚨 SPECIALIZED TASK COMPLEXITY FOR MEDUSA.JS
+
+Medusa.js tasks require specific complexity markers:
+
+1. **Level 1: Quick Fixes**
+   - UI adjustments
+   - CSS tweaks
+   - Text content changes
+   - Simple config updates
+
+2. **Level 2: Minor Features**
+   - Frontend component creation
+   - Simple API route additions
+   - UI integration with existing API
+   - Config customization
+
+3. **Level 3: Standard Features**
+   - New entity implementations
+   - Service creation/customization
+   - Custom endpoints with business logic
+   - Frontend feature implementation
+
+4. **Level 4: Complex Systems**
+   - Custom plugin development
+   - Payment gateway integration
+   - Multi-service workflows
+   - Performance optimizations
+   - Core service overrides
+
+## 🚨 MEDUSA.JS CONFIGURATION
+
+Configuration for a Medusa application is managed through the `medusa.config.ts` file (or `medusa-config.js` in older versions). Key configuration areas include:
+
+```typescript
+module.exports = defineConfig({
+  projectConfig: {
+    // Database connection
+    databaseUrl: process.env.DATABASE_URL,
+    
+    // CORS settings
+    http: {
+      storeCors: process.env.STORE_CORS!,
+      adminCors: process.env.ADMIN_CORS!,
+      authCors: process.env.AUTH_CORS!,
+      jwtSecret: process.env.JWT_SECRET || "supersecret",
+    },
+    
+    // Other core settings
+  },
+  
+  // Plugin configurations
+  plugins: [],
+  
+  // Module configurations
+  modules: {
+    // Various modules
+  }
+})
+```
+
+## 🚨 MEDUSA.JS SERVICE PATTERNS
+
+When implementing services, follow these patterns:
+
+```typescript
+// Example service pattern
+import { EntityManager } from "typeorm"
+import { ProductRepository } from "../repositories/product"
+import { EventBusService } from "."
+
+type InjectedDependencies = {
+  manager: EntityManager
+  productRepository: ProductRepository
+  eventBusService: EventBusService
+}
+
+class ProductService {
+  private manager: EntityManager
+  private productRepository: ProductRepository
+  private eventBusService: EventBusService
+
+  constructor({
+    manager,
+    productRepository,
+    eventBusService,
+  }: InjectedDependencies) {
+    this.manager = manager
+    this.productRepository = productRepository
+    this.eventBusService = eventBusService
+  }
+
+  async create(productData) {
+    return this.manager.transaction(async (transactionManager) => {
+      // Implementation
+      const product = await this.productRepository.create(productData)
+      
+      await this.eventBusService.emit("product.created", {
+        id: product.id
+      })
+      
+      return product
+    })
+  }
+}
+```
+
+## 🚨 MEDUSA.JS ENTITY RELATIONSHIPS
+
+Understand these critical entity relationships:
+
+1. **Products**:
+   - Product → Product Variants → Product Options
+   - Product → Product Collections
+   - Product → Product Tags
+   - Product → Product Categories
+   - Product → Product Images
+
+2. **Orders**:
+   - Order → Line Items → Product Variants
+   - Order → Shipping Methods
+   - Order → Payment Methods
+   - Order → Customer
+   - Order → Discounts
+
+3. **Customers**:
+   - Customer → Customer Groups
+   - Customer → Addresses
+   - Customer → Orders
+
+## 🚨 MEDUSA ARCHITECTURE LAYERS
+
+Based on the official Medusa architecture documentation, Medusa follows a layered approach:
+
+1. **HTTP Layer (API Routes)** - Entry point for all requests using Express.js
+2. **Workflow Layer** - Handles opinionated business logic
+3. **Module Layer** - Domain-specific resource management
+4. **Data Store Layer** - Database interaction (PostgreSQL)
+
+All of these layers can be implemented or extended via the plugin system.
+
+## 📝 MEDUSA.JS VERIFICATION CHECKLIST
+
+For all Medusa.js tasks, validate the following before completion:
+
+### API Implementation
+- [ ] Service methods properly transactional where needed
+- [ ] Repository methods used for database operations
+- [ ] Events emitted for key actions
+- [ ] Error handling implemented
+- [ ] Security considerations addressed
+
+### Frontend Implementation
+- [ ] Proper data fetching through Medusa hooks/fetch API
+- [ ] State management approach consistent
+- [ ] UI responsive across devices
+- [ ] Error states handled gracefully
+- [ ] Loading states implemented
+
+### Relationships
+- [ ] Entity relationships preserved
+- [ ] Foreign key constraints respected
+- [ ] Related entities updated appropriately
+
+### Code Quality
+- [ ] TypeScript types properly implemented
+- [ ] Services follow dependency injection pattern
+- [ ] Code aligned with existing patterns
+- [ ] Comments added for complex logic 

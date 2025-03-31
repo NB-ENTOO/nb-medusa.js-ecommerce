@@ -1,0 +1,154 @@
+---
+description: Medusa.js architectural principles and patterns
+globs: 
+alwaysApply: true
+---
+
+# 🏗️ MEDUSA.JS ARCHITECTURE
+
+> This file details the architectural patterns and principles of Medusa.js e-commerce platform.
+
+## 🚨 CORE ARCHITECTURAL PRINCIPLES
+
+1. **Headless Architecture** - Complete separation of frontend and backend concerns
+2. **Service-Based Design** - Business logic encapsulated in focused service classes
+3. **Repository Pattern** - Database operations abstracted through repositories
+4. **Event-Driven Communication** - Cross-service communication via events
+5. **Plugin-Based Extension** - Functionality extension through plugin system
+6. **Entity Relationships** - Complex entity relationships with clear hierarchies
+7. **Strategy Pattern** - Interchangeable implementations for specific functionality
+
+## 🚨 ARCHITECTURE LAYERS
+
+Medusa.js follows a layered architecture approach:
+
+1. **HTTP Layer (API Routes)**
+   - Entry point for all client requests
+   - Built on Express.js
+   - Handles routing, middleware, and response formatting
+   - Connects to Redis for session management
+
+2. **Workflow Layer**
+   - Contains opinionated business logic
+   - Orchestrates operations across multiple services
+   - Implements business rules and validations
+   - Manages transactional boundaries
+
+3. **Module Layer**
+   - Domain-specific resource management
+   - Handles CRUD operations for entities
+   - Implements domain-specific validations
+   - Manages relationships between entities
+
+4. **Data Store Layer**
+   - PostgreSQL database interaction
+   - Entity definitions and relationships
+   - Migrations and schema management
+   - Query optimization and performance
+
+```
+┌─────────────────┐
+│  HTTP Layer     │ ◄── Client Requests (Storefront, Admin)
+├─────────────────┤
+│  Workflow Layer │ ◄── Business Logic
+├─────────────────┤
+│  Module Layer   │ ◄── Resource Management
+├─────────────────┤
+│  Data Store     │ ◄── Database (PostgreSQL)
+└─────────────────┘
+```
+
+## 🚨 SERVICE PATTERN
+
+Services are the core building blocks of Medusa's business logic:
+
+```typescript
+class ProductService {
+  constructor(
+    private readonly manager: EntityManager,
+    private readonly productRepository: ProductRepository,
+    private readonly eventBusService: EventBusService
+  ) {}
+
+  async create(data) {
+    return this.manager.transaction(async (transactionManager) => {
+      // Create product using repository
+      const product = await this.productRepository
+        .withTransaction(transactionManager)
+        .create(data)
+      
+      // Emit product.created event
+      await this.eventBusService.emit("product.created", {
+        id: product.id
+      })
+      
+      return product
+    })
+  }
+}
+```
+
+Key aspects of the service pattern:
+- **Dependency Injection** - Services receive dependencies via constructor
+- **Transaction Management** - Operations wrapped in database transactions
+- **Repository Usage** - Database operations delegated to repositories
+- **Event Emission** - Events emitted for cross-service communication
+- **Single Responsibility** - Each service handles a specific domain
+
+## 🚨 REPOSITORY PATTERN
+
+Repositories abstract database operations for a specific entity:
+
+```typescript
+class ProductRepository extends BaseRepository {
+  constructor(manager) {
+    super(Product, manager)
+  }
+
+  async findWithRelations(
+    relations = [],
+    query = {}
+  ) {
+    // Implementation to find products with specific relations
+  }
+
+  async create(data) {
+    const product = this.manager.create(Product, data)
+    return this.manager.save(product)
+  }
+}
+```
+
+Key aspects of the repository pattern:
+- **Entity Focus** - Each repository handles a specific entity
+- **Encapsulation** - Hides database implementation details
+- **Query Abstraction** - Provides methods for common query patterns
+- **Relationship Management** - Handles loading of related entities
+- **Transaction Support** - Can be used within transactions
+
+## 🚨 EVENT SYSTEM
+
+The event system enables loose coupling between services:
+
+```typescript
+// Event emission
+eventBusService.emit("order.placed", { id: order.id })
+
+// Event subscription
+class OrderSubscriber {
+  constructor({ eventBusService }) {
+    eventBusService.subscribe("order.placed", this.handleOrderPlaced)
+  }
+
+  handleOrderPlaced = async (data) => {
+    // Handle the order.placed event
+  }
+}
+```
+
+Key aspects of the event system:
+- **Publish-Subscribe** - Publishers emit events, subscribers listen
+- **Asynchronous Processing** - Events handled asynchronously
+- **Service Decoupling** - Services communicate without direct dependencies
+- **Domain Events** - Events represent significant domain occurrences
+- **Extensibility** - Plugins can subscribe to core events 

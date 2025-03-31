@@ -1,0 +1,474 @@
+---
+description: Medusa.js admin dashboard development guidelines
+globs: 
+alwaysApply: true
+---
+
+# 🛠️ MEDUSA.JS ADMIN DASHBOARD
+
+> This file provides guidelines for working with and extending the Medusa Admin dashboard.
+
+## 🚨 ADMIN DASHBOARD OVERVIEW
+
+The Medusa Admin dashboard is a React application that provides a comprehensive interface for managing your Medusa store. It includes:
+
+1. **Product Management** - Create and manage products, variants, collections, etc.
+2. **Order Management** - Process orders, handle fulfillments, and manage returns
+3. **Customer Management** - View and manage customer accounts
+4. **Settings** - Configure store settings, shipping options, payment providers, etc.
+5. **Discounts** - Create and manage promotional campaigns
+6. **Gift Cards** - Issue and manage gift cards
+
+## 🚨 ADMIN CUSTOMIZATION APPROACHES
+
+There are three main approaches to customizing the Medusa Admin:
+
+1. **Admin Extension System** - Official way to extend the Admin UI with plugins
+2. **Admin API Routes** - Create custom endpoints in your Medusa backend
+3. **Custom Admin Dashboard** - Build your own admin interface using the Medusa API
+
+## 🚨 ADMIN EXTENSION SYSTEM
+
+The Admin Extension system allows you to extend the Admin UI without modifying its source code:
+
+### Setup
+
+```bash
+# Create a new Admin extension
+npx degit medusajs/admin-extension-example my-admin-extension
+
+# Navigate to the directory
+cd my-admin-extension
+
+# Install dependencies
+npm install
+
+# Start development
+npm run dev
+```
+
+### Extension Structure
+
+```
+admin-extension/
+├── src/
+│   ├── components/        # Custom React components
+│   ├── hooks/             # Custom React hooks
+│   ├── utils/             # Utility functions
+│   ├── extensions.ts      # Extension registration
+│   └── index.ts           # Entry point
+├── package.json           # Dependencies
+├── tsconfig.json          # TypeScript config
+└── vite.config.js         # Build configuration
+```
+
+### Extension Types
+
+The Admin extension system supports several types of extensions:
+
+1. **Widget Extensions**: Add UI elements to specific areas of the Admin
+2. **Route Extensions**: Add new pages to the Admin
+3. **Setting Extensions**: Add new sections to the Settings page
+
+### Widget Extensions
+
+Widget extensions allow you to add UI elements to predefined widget areas:
+
+```tsx
+// src/components/product-widget.tsx
+import type { WidgetConfig, ProductDetailsWidgetProps } from "@medusajs/admin"
+
+const ProductWidget = ({ product }: ProductDetailsWidgetProps) => {
+  return (
+    <div className="bg-white p-4 border border-gray-200 rounded-lg">
+      <h2 className="font-semibold text-gray-900">
+        Custom Product Widget
+      </h2>
+      <p className="text-gray-700 mt-2">
+        Product ID: {product.id}
+      </p>
+      {/* Additional custom UI */}
+    </div>
+  )
+}
+
+export const config: WidgetConfig = {
+  zone: "product.details.after"
+}
+
+export default ProductWidget
+```
+
+Register the widget in `extensions.ts`:
+
+```tsx
+// src/extensions.ts
+import { ProductWidget } from "./components/product-widget"
+
+export const extensions = {
+  widgets: {
+    "product-widget": ProductWidget
+  }
+}
+```
+
+### Route Extensions
+
+Route extensions allow you to add new pages to the Admin:
+
+```tsx
+// src/components/custom-page.tsx
+import type { RouteConfig } from "@medusajs/admin"
+
+const CustomPage = () => {
+  return (
+    <div className="px-large py-xsmall">
+      <h1 className="text-grey-90 text-xlarge font-semibold">
+        Custom Admin Page
+      </h1>
+      {/* Your custom page content */}
+    </div>
+  )
+}
+
+export const config: RouteConfig = {
+  link: {
+    label: "Custom Page",
+    icon: () => <span>📝</span>
+  }
+}
+
+export default CustomPage
+```
+
+Register the route in `extensions.ts`:
+
+```tsx
+// src/extensions.ts
+import { ProductWidget } from "./components/product-widget"
+import { CustomPage } from "./components/custom-page"
+
+export const extensions = {
+  widgets: {
+    "product-widget": ProductWidget
+  },
+  routes: [
+    {
+      path: "/custom",
+      element: CustomPage
+    }
+  ]
+}
+```
+
+### Settings Extensions
+
+Settings extensions allow you to add new sections to the Settings page:
+
+```tsx
+// src/components/custom-settings.tsx
+import type { SettingConfig } from "@medusajs/admin"
+
+const CustomSettings = () => {
+  return (
+    <div>
+      <h1 className="text-grey-90 text-xlarge font-semibold">
+        Custom Settings
+      </h1>
+      {/* Your custom settings UI */}
+    </div>
+  )
+}
+
+export const config: SettingConfig = {
+  card: {
+    label: "Custom Settings",
+    description: "Manage your custom settings"
+  }
+}
+
+export default CustomSettings
+```
+
+Register the settings in `extensions.ts`:
+
+```tsx
+// src/extensions.ts
+import { ProductWidget } from "./components/product-widget"
+import { CustomPage } from "./components/custom-page"
+import { CustomSettings } from "./components/custom-settings"
+
+export const extensions = {
+  widgets: {
+    "product-widget": ProductWidget
+  },
+  routes: [
+    {
+      path: "/custom",
+      element: CustomPage
+    }
+  ],
+  settings: {
+    "custom-settings": CustomSettings
+  }
+}
+```
+
+## 🚨 ADMIN API ROUTES
+
+To support custom Admin functionality, you may need to create custom API endpoints:
+
+```typescript
+// src/api/routes/admin/custom/index.ts
+import { Router } from "express"
+import { wrapHandler } from "@medusajs/medusa"
+import { isAdmin } from "@medusajs/medusa/dist/api/middlewares/auth"
+
+export default (router: Router) => {
+  const customRouter = Router()
+  
+  router.use("/custom", isAdmin(), customRouter)
+  
+  customRouter.get("/", wrapHandler(async (req, res) => {
+    // Implement your custom logic
+    res.json({
+      success: true,
+      data: { /* your data */ }
+    })
+  }))
+  
+  return router
+}
+```
+
+Register the route in a loader:
+
+```typescript
+// src/loaders/admin-routes.ts
+import customRoutes from "../api/routes/admin/custom"
+
+export default (app, container) => {
+  const router = container.resolve("router")
+  
+  app.use("/admin/custom", (req, res, next) => {
+    if (req.method === "OPTIONS") {
+      res.sendStatus(200)
+    } else {
+      next()
+    }
+  })
+  
+  router.use("/admin", customRoutes(router))
+}
+```
+
+## 🚨 ADMIN UI COMPONENTS
+
+Medusa provides a UI component library for building admin interfaces:
+
+```bash
+npm install @medusajs/ui @medusajs/ui-preset
+```
+
+Configure Tailwind CSS:
+
+```js
+// tailwind.config.js
+module.exports = {
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  presets: [require("@medusajs/ui-preset")],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+### Available Components
+
+The Medusa UI library provides a range of components:
+
+**Button:**
+```tsx
+import { Button } from "@medusajs/ui"
+
+const SaveButton = () => {
+  return (
+    <Button variant="primary" size="base" onClick={handleSave}>
+      Save Changes
+    </Button>
+  )
+}
+```
+
+**Input:**
+```tsx
+import { Input } from "@medusajs/ui"
+import { useState } from "react"
+
+const NameInput = () => {
+  const [name, setName] = useState("")
+  
+  return (
+    <Input
+      label="Name"
+      placeholder="Enter your name"
+      value={name}
+      onChange={(e) => setName(e.target.value)}
+    />
+  )
+}
+```
+
+**Table:**
+```tsx
+import { Table, useTable } from "@medusajs/ui"
+
+const ProductTable = ({ products }) => {
+  const table = useTable({
+    data: products,
+    columns: [
+      {
+        header: "Title",
+        accessorKey: "title",
+      },
+      {
+        header: "Price",
+        accessorKey: "variants[0].prices[0].amount",
+        cell: ({ cell }) => formatAmount(cell.getValue()),
+      },
+    ],
+  })
+  
+  return <Table table={table} />
+}
+```
+
+## 🚨 CUSTOM ADMIN DASHBOARD
+
+If you need complete control, you can build a custom admin dashboard:
+
+### Technologies
+- React for UI components
+- React Router for navigation
+- React Query for data fetching
+- Medusa API for backend communication
+- Tailwind CSS for styling (optional)
+
+### Project Structure
+
+```
+custom-admin/
+├── src/
+│   ├── components/         # UI components
+│   ├── context/            # Context providers
+│   ├── hooks/              # Custom hooks
+│   ├── pages/              # Admin pages
+│   ├── services/           # API services
+│   ├── utils/              # Utility functions
+│   ├── App.tsx             # Main application
+│   └── index.tsx           # Entry point
+├── public/                 # Static assets
+├── package.json            # Dependencies
+└── tsconfig.json           # TypeScript config
+```
+
+### Authentication
+
+Implement authentication with the Medusa API:
+
+```tsx
+// src/context/auth-context.tsx
+import { createContext, useContext, useState, useEffect } from "react"
+import { adminLogin, getCurrentUser } from "../services/auth"
+
+const AuthContext = createContext(null)
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
+  
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { user } = await getCurrentUser()
+        setUser(user)
+      } catch (error) {
+        console.error(error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    checkAuth()
+  }, [])
+  
+  // Login function
+  const login = async (email, password) => {
+    const { user } = await adminLogin({ email, password })
+    setUser(user)
+    return user
+  }
+  
+  // Logout function
+  const logout = async () => {
+    // Implement logout logic
+    setUser(null)
+  }
+  
+  return (
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export const useAuth = () => useContext(AuthContext)
+```
+
+### API Services
+
+Create services for interacting with the Medusa API:
+
+```tsx
+// src/services/products.ts
+import { medusaClient } from "./client"
+
+export const getProducts = async (query = {}) => {
+  const response = await medusaClient.get("/admin/products", { params: query })
+  return response.data
+}
+
+export const getProduct = async (id) => {
+  const response = await medusaClient.get(`/admin/products/${id}`)
+  return response.data
+}
+
+export const createProduct = async (data) => {
+  const response = await medusaClient.post("/admin/products", data)
+  return response.data
+}
+
+export const updateProduct = async (id, data) => {
+  const response = await medusaClient.post(`/admin/products/${id}`, data)
+  return response.data
+}
+
+export const deleteProduct = async (id) => {
+  const response = await medusaClient.delete(`/admin/products/${id}`)
+  return response.data
+}
+```
+
+## 🚨 BEST PRACTICES
+
+1. **Follow UI Patterns**: Maintain consistency with the existing Admin UI
+2. **Use TypeScript**: Define proper types for all components and API responses
+3. **Handle Permissions**: Respect admin user permissions in custom functionality
+4. **Loading States**: Always show loading indicators during API requests
+5. **Error Handling**: Properly handle and display API errors
+6. **Form Validation**: Validate inputs before submitting to the API
+7. **Responsive Design**: Ensure your custom UI works on different screen sizes
+8. **Accessibility**: Make your admin extensions accessible
+9. **Performance**: Optimize data fetching and rendering 

@@ -1,0 +1,175 @@
+---
+description: Workflow implementation for the Adaptive Memory Bank System
+globs: 
+alwaysApply: true
+---
+
+# 🔄 ADAPTIVE WORKFLOW IMPLEMENTATION
+
+> This file details the implementation of the adaptive workflow system, which automatically scales based on task complexity.
+
+## 🚨 AUTOMATIC COMPLEXITY DETECTION
+
+The system now automatically classifies tasks by their complexity without requiring explicit commands:
+
+### Complexity Detection Criteria
+
+Tasks are analyzed based on:
+
+1. **Scope** - How many files, entities, or systems are affected
+2. **Technical Depth** - How deep into the system architecture the changes go
+3. **Implementation Effort** - Estimated effort to implement
+4. **Risk Level** - Potential impact on existing functionality
+5. **Integration Points** - How many other components interact with the change
+
+### Classification Rules
+
+| Complexity | Description | Triggers | Documentation Level |
+|------------|-------------|----------|---------------------|
+| **Level 1** | Quick Bug Fix | Single file changes, CSS updates, text content, config tweaks | 2-3 updates |
+| **Level 2** | Simple Enhancement | New UI component, API integration, small feature | 4-6 updates |
+| **Level 3** | Intermediate Feature | New entity or service, multi-component feature | 8-12 updates |
+| **Level 4** | Complex System | Architecture changes, new subsystem, complex integration | 15+ updates |
+
+## 🚨 NATURAL INTERACTION MODEL
+
+Tasks are now identified through natural language interaction:
+
+1. **Implicit Recognition**
+   - When a statement like "I need to implement X" or "Let's build Y" is detected
+   - When specific technical requirements are described
+   - When project modification instructions are given
+
+2. **Context Continuation**
+   - Related follow-up tasks are recognized as part of the same workflow
+   - Context is maintained across conversation
+   - Documentation is updated incrementally
+
+3. **Workflow Selection**
+   - Appropriate workflow is automatically applied
+   - Level-appropriate checkpoints are verified
+   - Documentation depth matches task complexity
+
+## 🚨 WORKFLOW IMPLEMENTATION BY LEVEL
+
+### Level 1: Quick Bug Fix
+
+```
+INITIALIZATION → IMPLEMENTATION → DOCUMENTATION
+```
+
+**Triggers**: UI adjustments, text changes, simple config updates, CSS tweaks
+
+**Documentation**:
+- Brief task entry in tasks.md
+- Single update to activeContext.md
+- No extensive planning required
+
+**Implementation**:
+- Direct fix implementation
+- Single-file changes typically
+- Verification of fix effectiveness
+
+### Level 2: Simple Enhancement
+
+```
+INITIALIZATION → DOCUMENTATION SETUP → PLANNING → 
+IMPLEMENTATION → REFLECTION → SIMPLE ARCHIVING
+```
+
+**Triggers**: New UI component, simple API integration, configuration customization, basic data operations
+
+**Documentation**:
+- Full task entry in tasks.md
+- Updates to relevant Memory Bank files
+- Basic 3-5 step implementation plan
+- Brief reflection on completion
+
+**Implementation**:
+- Step-by-step implementation following plan
+- Status updates at key milestones
+- Testing and verification
+
+### Level 3: Intermediate Feature
+
+```
+INITIALIZATION → DOCUMENTATION SETUP → TASK PLANNING → 
+IMPLEMENTATION → REFLECTION → ARCHIVING
+```
+
+**Triggers**: New entity implementation, service customization, custom API endpoint, frontend feature
+
+**Documentation**:
+- Comprehensive task entry in tasks.md
+- Updates to multiple Memory Bank files
+- Detailed implementation plan with subtasks
+- Technical approach documentation
+- Full reflection with lessons learned
+
+**Implementation**:
+- Phased implementation with checkpoints
+- Creative phases for complex components
+- Regular status updates
+- Comprehensive testing
+
+### Level 4: Complex System
+
+```
+INITIALIZATION → DOCUMENTATION SETUP → TASK PLANNING → 
+IMPLEMENTATION → REFLECTION → ARCHIVING
+```
+
+**Triggers**: Custom plugin development, payment integration, multi-service workflow, performance optimization
+
+**Documentation**:
+- Extensive task entry in tasks.md
+- Comprehensive updates to all Memory Bank files
+- Detailed implementation plan with major and minor tasks
+- Architecture documentation
+- Risk assessment and mitigation plan
+- Comprehensive reflection and archiving
+
+**Implementation**:
+- Highly structured implementation
+- Multiple creative phases
+- Frequent status updates
+- Extensive testing at multiple levels
+- Formal verification against requirements
+
+## 🚨 WORKFLOW TRANSITIONS
+
+As tasks evolve, the system can transition between complexity levels:
+
+1. **Escalation**
+   - When a task is found to be more complex than initially assessed
+   - Additional planning and documentation added
+   - More detailed implementation steps created
+
+2. **De-escalation**
+   - When a task proves simpler than initially assessed
+   - Streamlined workflow applied
+   - Documentation requirements reduced
+
+3. **Task Splitting**
+   - Complex tasks broken into smaller, manageable sub-tasks
+   - Each sub-task treated with its own complexity level
+   - Parent task tracks overall progress
+
+## 🚨 EXECUTION SAFETY
+
+Regardless of complexity level, these safety measures always apply:
+
+1. **Command Execution**
+   - Execute commands ONE AT A TIME
+   - Verify success before proceeding
+   - Handle errors appropriately
+
+2. **Documentation Integrity**
+   - tasks.md remains the SINGLE SOURCE OF TRUTH
+   - All changes traceable to requirements
+   - Progress consistently tracked
+
+3. **Platform Awareness**
+   - Commands adapted to current platform
+   - Environment-specific considerations documented
+   - Compatibility issues addressed

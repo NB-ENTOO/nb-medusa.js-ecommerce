@@ -1,0 +1,270 @@
+---
+description: Medusa.js development workflow and best practices
+globs: 
+alwaysApply: true
+---
+
+# 🔄 MEDUSA.JS DEVELOPMENT WORKFLOW
+
+> This file outlines the development workflow and best practices for Medusa.js e-commerce platform.
+
+## 🚨 PROJECT SETUP
+
+### Prerequisites
+
+- Node.js (v16 or higher)
+- PostgreSQL (v10 or higher)
+- Redis (recommended for caching/queue)
+- Git
+
+### Installation
+
+```bash
+# Install Medusa CLI globally
+npm install -g @medusajs/medusa-cli
+
+# Create a new Medusa project
+npx create-medusa-app
+
+# Start the development server
+cd my-medusa-store
+medusa develop
+```
+
+### Project Structure
+
+```
+medusa-project/
+├── src/                      # Custom code
+│   ├── api/                  # Custom API routes
+│   ├── migrations/           # Database migrations
+│   ├── models/               # Custom entity models
+│   ├── repositories/         # Data access layer
+│   ├── services/             # Business logic
+│   └── subscribers/          # Event handlers
+├── medusa-config.ts          # Configuration file
+├── package.json              # Dependencies
+└── tsconfig.json             # TypeScript config
+```
+
+## 🚨 DEVELOPMENT WORKFLOW
+
+### 1. Understanding Requirements
+
+Before coding, understand:
+- What entities are involved?
+- What business rules apply?
+- What events should be emitted?
+- What transactional boundaries exist?
+
+### 2. Database Schema Changes
+
+If your feature requires schema changes:
+1. Create a migration file:
+   ```bash
+   medusa migrations create add-feature-xyz
+   ```
+2. Implement the migration in `src/migrations/[timestamp]-add-feature-xyz.ts`
+3. Test the migration on a development database
+
+### 3. Implementing Services
+
+When implementing business logic:
+1. Create/modify service files in `src/services/`
+2. Follow the dependency injection pattern
+3. Use repositories for database operations
+4. Wrap operations in transactions when needed
+5. Emit appropriate events
+
+Example service implementation:
+```typescript
+import { Service } from 'medusa-extender'
+import { EntityManager } from 'typeorm'
+import { EventBusService } from '@medusajs/medusa'
+
+@Service()
+export class CustomService {
+  constructor(
+    private manager: EntityManager,
+    private eventBus: EventBusService
+  ) {}
+
+  async performOperation(data) {
+    return this.manager.transaction(async (transactionManager) => {
+      // Implement business logic
+      
+      // Emit events
+      await this.eventBus.emit("custom.event", { /* data */ })
+      
+      return result
+    })
+  }
+}
+```
+
+### 4. Extending API
+
+To add custom API endpoints:
+1. Create route files in `src/api/routes/`
+2. Use the Express.js routing syntax
+3. Add proper validation middleware
+4. Handle errors correctly
+
+Example API route:
+```typescript
+import { Router } from 'express'
+import { wrapHandler } from '@medusajs/medusa'
+import { CustomService } from '../../services/custom-service'
+
+export default (router: Router) => {
+  const customRouter = Router()
+  
+  router.use('/custom', customRouter)
+  
+  customRouter.get('/', wrapHandler(async (req, res) => {
+    const customService = req.scope.resolve(CustomService.resolutionKey)
+    const result = await customService.list(req.query)
+    res.json(result)
+  }))
+  
+  return router
+}
+```
+
+### 5. Testing
+
+For effective testing:
+1. Use Jest as the testing framework
+2. Create unit tests for services
+3. Create integration tests for API endpoints
+4. Mock dependencies using Jest's mock functions
+5. Use the `medusa-test-utils` package for common testing scenarios
+
+Example test:
+```typescript
+import { CustomService } from '../services/custom-service'
+
+describe('CustomService', () => {
+  describe('performOperation', () => {
+    it('should perform the operation correctly', async () => {
+      // Arrange
+      const mockManager = {
+        transaction: jest.fn().mockImplementation(cb => cb()),
+      }
+      const mockEventBus = {
+        emit: jest.fn().mockResolvedValue(undefined),
+      }
+      
+      const service = new CustomService(mockManager, mockEventBus)
+      
+      // Act
+      await service.performOperation({ /* test data */ })
+      
+      // Assert
+      expect(mockEventBus.emit).toHaveBeenCalledWith(
+        "custom.event",
+        expect.any(Object)
+      )
+    })
+  })
+})
+```
+
+## 🚨 DEVELOPMENT BEST PRACTICES
+
+### Code Organization
+
+1. **Single Responsibility Principle**: Each service/repository should have a single responsibility
+2. **Clear Domain Boundaries**: Keep related functionality together
+3. **Consistent Naming**: Follow the established naming conventions
+
+### Performance Considerations
+
+1. **Query Optimization**: Use efficient queries and proper indexing
+2. **N+1 Problem**: Avoid by using proper relation loading
+3. **Pagination**: Always implement pagination for list endpoints
+4. **Selective Loading**: Only load the data you need
+
+### Error Handling
+
+1. **Custom Error Classes**: Use Medusa's error classes for consistent error handling
+2. **Transaction Rollback**: Ensure errors trigger transaction rollbacks
+3. **Client-Friendly Errors**: Return user-friendly error messages to clients
+
+### Security Best Practices
+
+1. **Input Validation**: Validate all input data
+2. **Authentication**: Properly secure endpoints with authentication
+3. **Authorization**: Check permissions before performing operations
+4. **Sensitive Data**: Never expose sensitive data in responses
+
+## 🚨 PLUGIN DEVELOPMENT
+
+For developing reusable plugins:
+
+1. **Plugin Structure**:
+   ```
+   medusa-plugin-custom/
+   ├── src/
+   │   ├── api/
+   │   ├── services/
+   │   └── loaders/
+   ├── package.json
+   └── README.md
+   ```
+
+2. **Plugin Registration**:
+   ```typescript
+   // In medusa-config.js
+   module.exports = {
+     plugins: [
+       {
+         resolve: `medusa-plugin-custom`,
+         options: {
+           // Plugin options
+         }
+       }
+     ]
+   }
+   ```
+
+3. **Service Registration**:
+   ```typescript
+   // In src/loaders/index.js
+   export default async (container) => {
+     container.register('custom-service', CustomService)
+   }
+   ```
+
+## 🚨 FRONTEND INTEGRATION
+
+When developing frontends:
+
+1. **Use Medusa JS Client**:
+   ```typescript
+   import Medusa from "@medusajs/medusa-js"
+   
+   const medusa = new Medusa({ baseUrl: "http://localhost:9000" })
+   
+   // Use client to interact with Medusa API
+   const products = await medusa.products.list()
+   ```
+
+2. **Use React Hooks** (for React applications):
+   ```typescript
+   import { useProducts } from "medusa-react"
+   
+   const ProductList = () => {
+     const { products, isLoading } = useProducts()
+     
+     if (isLoading) return <div>Loading...</div>
+     
+     return (
+       <div>
+         {products.map(product => (
+           <div key={product.id}>{product.title}</div>
+         ))}
+       </div>
+     )
+   }
+   ``` 

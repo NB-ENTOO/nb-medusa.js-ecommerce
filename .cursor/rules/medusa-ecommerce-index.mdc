@@ -1,0 +1,188 @@
+---
+description: Medusa.js E-Commerce master index file
+globs: 
+alwaysApply: true
+---
+
+# 🛒 MEDUSA.JS E-COMMERCE MASTER INDEX
+
+> This file serves as the entry point to the modular Medusa.js documentation. It references all module files and provides a high-level overview.
+
+## 🚨 AUTOMATIC WORKFLOW PROCESSING
+
+The Medusa.js e-commerce development follows an adaptive workflow that **automatically determines task complexity** without requiring explicit commands:
+
+1. **Implicit Task Detection**
+   - Tasks are identified from natural language requests
+   - No need for explicit "VAN" commands or protocol triggers
+   - Simply describe what needs to be built or modified
+
+2. **Automatic Complexity Assessment**
+   - Tasks are automatically categorized into Levels 1-4
+   - Appropriate workflow is applied based on complexity
+   - Documentation depth scales with task complexity
+
+3. **Continuous Memory Management**
+   - Memory bank files are updated automatically
+   - Documentation is maintained in the background
+   - Project context is preserved across conversations
+
+4. **Natural Interaction Flow**
+   - Describe requirements in natural language
+   - Receive appropriate level of planning and execution
+   - Focus on development goals rather than process commands
+
+## 🚨 MODULE STRUCTURE
+
+The Medusa.js e-commerce documentation is divided into specialized modules:
+
+1. **Architecture** - [medusa-modules/01-architecture.mdc](mdc:.cursor/rules/medusa-modules/01-architecture.mdc)
+   - Core architectural principles
+   - Layered architecture approach
+   - Service pattern implementation
+   - Repository pattern usage
+   - Event system
+
+2. **Entity Relationships** - [medusa-modules/02-entity-relationships.mdc](mdc:.cursor/rules/medusa-modules/02-entity-relationships.mdc)
+   - Product hierarchy
+   - Order processing flow
+   - Customer management
+   - Price management
+   - Discount system
+   - Entity diagrams and schemas
+
+3. **Development Workflow** - [medusa-modules/03-development-workflow.mdc](mdc:.cursor/rules/medusa-modules/03-development-workflow.mdc)
+   - Project setup
+   - Development process
+   - Service implementation
+   - API extension
+   - Testing practices
+   - Best practices
+
+4. **Storefront Development** - [medusa-modules/04-storefront-development.mdc](mdc:.cursor/rules/medusa-modules/04-storefront-development.mdc)
+   - Storefront options
+   - Next.js implementation
+   - React hooks and components
+   - State management
+   - Performance optimization
+   - UI component patterns
+
+5. **Admin Dashboard** - [medusa-modules/05-admin-dashboard.mdc](mdc:.cursor/rules/medusa-modules/05-admin-dashboard.mdc)
+   - Admin dashboard overview
+   - Extension system
+   - Custom API routes
+   - UI components
+   - Custom dashboard implementation
+   - Best practices
+
+## 🚨 COMPREHENSIVE DOCUMENTATION
+
+For complete Medusa.js documentation, refer to the `llms-medusa.mdc` file, which contains comprehensive information on all aspects of Medusa.js development.
+
+## 🚨 MEDUSA.JS COMPLEXITY LEVELS
+
+Tasks are automatically categorized by complexity:
+
+1. **Level 1: Quick Fixes**
+   - UI adjustments
+   - Text changes
+   - Simple configuration updates
+   - CSS modifications
+   - Documentation: 2-3 brief updates
+
+2. **Level 2: Minor Features**
+   - Frontend component creation
+   - Simple API integrations
+   - Configuration customization
+   - Basic data operations
+   - Documentation: 4-6 key milestone updates
+
+3. **Level 3: Standard Features**
+   - New entity implementations
+   - Service customization
+   - Custom endpoints with business logic
+   - Frontend feature development
+   - Documentation: 8-12 structured updates
+
+4. **Level 4: Complex Systems**
+   - Custom plugin development
+   - Payment gateway integration
+   - Multi-service workflows
+   - Performance optimization
+   - Core service overrides
+   - Documentation: 15+ detailed updates with formal verification
+
+## 🚨 DEVELOPMENT PROCESS OVERVIEW
+
+The Medusa.js development process follows these general steps, automatically scaled by complexity:
+
+1. **Planning**
+   - Define requirements
+   - Identify affected entities and services
+   - Plan database changes
+   - Consider API implications
+
+2. **Implementation**
+   - Create/modify services
+   - Implement database changes
+   - Develop API endpoints
+   - Build frontend components
+
+3. **Testing**
+   - Unit test services
+   - Integration test API endpoints
+   - End-to-end test workflows
+   - Verify database integrity
+
+4. **Deployment**
+   - Deploy backend changes
+   - Update admin dashboard
+   - Deploy storefront changes
+   - Monitor performance
+
+5. **Maintenance**
+   - Address bugs
+   - Performance optimization
+   - Feature enhancements
+   - Documentation updates
+
+## 🚨 MEMORY BANK INTEGRATION
+
+Refer to these memory bank files for project-specific context:
+
+- `projectbrief.md` - Project requirements and goals
+- `productContext.md` - Business context for our implementation
+- `techContext.md` - Technical stack details
+- `systemPatterns.md` - System architecture and patterns
+- `activeContext.md` - Current development focus
+- `progress.md` - Implementation progress
+- `tasks.md` - Task tracking
+
+## 🚨 VERIFICATION CHECKLISTS
+
+Before completing any Medusa.js task, verify:
+
+### API Implementation
+- [ ] Service methods properly transactional where needed
+- [ ] Repository methods used for database operations
+- [ ] Events emitted for key actions
+- [ ] Error handling implemented
+- [ ] Security considerations addressed
+
+### Frontend Implementation
+- [ ] Proper data fetching through Medusa hooks/fetch API
+- [ ] State management approach consistent
+- [ ] UI responsive across devices
+- [ ] Error states handled gracefully
+- [ ] Loading states implemented
+
+### Relationships
+- [ ] Entity relationships preserved
+- [ ] Foreign key constraints respected
+- [ ] Related entities updated appropriately
+
+### Code Quality
+- [ ] TypeScript types properly implemented
+- [ ] Services follow dependency injection pattern
+- [ ] Code aligned with existing patterns
+- [ ] Comments added for complex logic 

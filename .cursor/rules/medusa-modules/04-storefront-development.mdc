@@ -1,0 +1,392 @@
+---
+description: Medusa.js storefront development guidelines
+globs: 
+alwaysApply: true
+---
+
+# 🏪 MEDUSA.JS STOREFRONT DEVELOPMENT
+
+> This file provides guidelines for developing storefronts for Medusa.js e-commerce platform.
+
+## 🚨 STOREFRONT OPTIONS
+
+Medusa.js supports multiple approaches to storefront development:
+
+1. **Next.js Starter** - Official starter with comprehensive e-commerce features
+2. **Gatsby Starter** - Alternative starter with Gatsby's static site capabilities  
+3. **Custom Frontend** - Build your own using the Medusa JS Client
+4. **Headless CMS Integration** - Combine Medusa with a headless CMS
+
+## 🚨 NEXT.JS STOREFRONT
+
+### Setup
+
+```bash
+# Clone the starter
+npx create-next-app -e https://github.com/medusajs/nextjs-starter-medusa my-medusa-storefront
+
+# Navigate to the directory
+cd my-medusa-storefront
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+### Project Structure
+
+```
+nextjs-starter-medusa/
+├── components/            # UI components
+│   ├── common/            # General components
+│   ├── layout/            # Layout components
+│   ├── products/          # Product-related components
+│   └── checkout/          # Checkout-related components
+├── lib/                   # Utility functions and API clients
+│   ├── context/           # React context providers
+│   └── hooks/             # Custom React hooks
+├── pages/                 # Next.js pages
+│   ├── products/          # Product pages
+│   ├── account/           # Customer account pages
+│   ├── checkout/          # Checkout process
+│   └── api/               # API routes
+├── styles/                # CSS and styling
+├── public/                # Static assets
+├── next.config.js         # Next.js configuration
+└── package.json           # Dependencies
+```
+
+### Key Features
+
+The Next.js starter provides:
+- Product browsing and search
+- Product detail pages with variants
+- Cart management
+- Checkout flow
+- User authentication
+- Order history
+- Account management
+
+## 🚨 MEDUSA REACT
+
+Medusa provides a React library with hooks for common operations:
+
+```bash
+npm install @medusajs/medusa-js medusa-react
+```
+
+Setup the provider in your application:
+
+```jsx
+import { MedusaProvider } from "medusa-react"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import Medusa from "@medusajs/medusa-js"
+
+const queryClient = new QueryClient()
+const medusaClient = new Medusa({ 
+  baseUrl: "http://localhost:9000",
+  maxRetries: 3
+})
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <MedusaProvider client={medusaClient}>
+        <YourApp />
+      </MedusaProvider>
+    </QueryClientProvider>
+  )
+}
+```
+
+### Available Hooks
+
+Medusa React provides hooks for all core operations:
+
+**Products:**
+```jsx
+import { useProducts, useProduct } from "medusa-react"
+
+// Get a list of products
+const { products, isLoading } = useProducts()
+
+// Get a single product
+const { product } = useProduct("prod_123")
+```
+
+**Cart:**
+```jsx
+import { useCart, useCreateCart, useAddLineItem } from "medusa-react"
+
+// Get or create cart
+const { cart } = useCart()
+const createCart = useCreateCart()
+
+// Add item to cart
+const addItem = useAddLineItem(cart?.id)
+addItem.mutate({
+  variant_id: "variant_123",
+  quantity: 1
+})
+```
+
+**Checkout:**
+```jsx
+import { useUpdateCart, useCompleteCart } from "medusa-react"
+
+// Update shipping address
+const updateCart = useUpdateCart(cart?.id)
+updateCart.mutate({
+  shipping_address: {
+    first_name: "John",
+    last_name: "Doe",
+    // ...other fields
+  }
+})
+
+// Complete checkout
+const completeCart = useCompleteCart(cart?.id)
+completeCart.mutate()
+```
+
+**Customer:**
+```jsx
+import { useCustomer, useCreateCustomer, useLogin } from "medusa-react"
+
+// Get current customer
+const { customer } = useCustomer()
+
+// Create customer account
+const createCustomer = useCreateCustomer()
+createCustomer.mutate({
+  email: "customer@example.com",
+  password: "secure-password",
+  first_name: "John",
+  last_name: "Doe"
+})
+
+// Login
+const login = useLogin()
+login.mutate({
+  email: "customer@example.com",
+  password: "secure-password"
+})
+```
+
+## 🚨 STOREFRONT STATE MANAGEMENT
+
+### Cart Management
+
+Best practices for cart management:
+1. Use `localStorage` to persist cart ID
+2. Create cart if one doesn't exist
+3. Use React context to share cart state
+4. Update cart totals after each modification
+
+Example cart context:
+```jsx
+import { createContext, useContext, useEffect, useState } from "react"
+import { useCart, useCreateCart } from "medusa-react"
+
+const CartContext = createContext(null)
+
+export const CartProvider = ({ children }) => {
+  const [cartId, setCartId] = useState(null)
+  
+  // Load cart ID from localStorage
+  useEffect(() => {
+    const storedCartId = localStorage.getItem("cartId")
+    if (storedCartId) {
+      setCartId(storedCartId)
+    }
+  }, [])
+  
+  // Get cart with the ID
+  const { cart, isLoading } = useCart(cartId)
+  
+  // Create cart mutation
+  const createCart = useCreateCart()
+  
+  // Create a new cart if none exists
+  const createNewCart = async () => {
+    const { cart: newCart } = await createCart.mutateAsync()
+    localStorage.setItem("cartId", newCart.id)
+    setCartId(newCart.id)
+    return newCart
+  }
+  
+  return (
+    <CartContext.Provider value={{ 
+      cart, 
+      isLoading, 
+      createNewCart,
+      cartId
+    }}>
+      {children}
+    </CartContext.Provider>
+  )
+}
+
+export const useCartContext = () => useContext(CartContext)
+```
+
+### Authentication State
+
+Best practices for authentication:
+1. Use cookies for persistent sessions
+2. Handle authenticated/unauthenticated states
+3. Redirect for protected routes
+4. Clear state on logout
+
+Example authentication context:
+```jsx
+import { createContext, useContext, useEffect, useState } from "react"
+import { useLogin, useLogout, useCustomer } from "medusa-react"
+
+const AuthContext = createContext(null)
+
+export const AuthProvider = ({ children }) => {
+  const { customer, isLoading } = useCustomer()
+  const login = useLogin()
+  const logout = useLogout()
+  
+  const handleLogin = async (email, password) => {
+    await login.mutateAsync({ email, password })
+  }
+  
+  const handleLogout = async () => {
+    await logout.mutateAsync()
+  }
+  
+  return (
+    <AuthContext.Provider value={{ 
+      customer, 
+      isLoading, 
+      isAuthenticated: !!customer,
+      login: handleLogin,
+      logout: handleLogout
+    }}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export const useAuth = () => useContext(AuthContext)
+```
+
+## 🚨 RESPONSIVE DESIGN
+
+Best practices for responsive design in Medusa storefronts:
+
+1. **Mobile-First Approach**: Design for mobile first, then enhance for larger screens
+2. **Flexible Grids**: Use CSS Grid or Flexbox for product listings
+3. **Responsive Images**: Use Next.js Image component with responsive sizes
+4. **Tailwind CSS**: Leverage Tailwind's responsive utility classes (if using Tailwind)
+5. **Breakpoints**: Define consistent breakpoints across the application
+
+Example product grid with responsiveness:
+
+```jsx
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+  {products.map((product) => (
+    <ProductCard key={product.id} product={product} />
+  ))}
+</div>
+```
+
+## 🚨 PERFORMANCE OPTIMIZATION
+
+Best practices for frontend performance:
+
+1. **Static Generation**: Use Next.js static generation for product pages
+2. **Incremental Static Regeneration**: Update content without rebuilding
+3. **Image Optimization**: Use Next.js Image component
+4. **Code Splitting**: Leverage dynamic imports for code splitting
+5. **Cache Control**: Implement proper cache headers
+6. **Bundle Analysis**: Monitor bundle size with tools like `@next/bundle-analyzer`
+
+Example of static generation with ISR:
+
+```jsx
+// pages/products/[handle].js
+export async function getStaticPaths() {
+  // Get most popular products for pre-rendering
+  const { products } = await medusaClient.products.list({ limit: 10 })
+  
+  return {
+    paths: products.map((p) => ({ params: { handle: p.handle } })),
+    fallback: 'blocking'
+  }
+}
+
+export async function getStaticProps({ params }) {
+  const { handle } = params
+  const { product } = await medusaClient.products.retrieve(handle)
+  
+  return {
+    props: { product },
+    revalidate: 60 // Revalidate every 60 seconds
+  }
+}
+```
+
+## 🚨 UI COMPONENT BEST PRACTICES
+
+For developing UI components:
+
+1. **Component Reusability**: Create reusable components for common patterns
+2. **Prop Validation**: Use TypeScript interfaces for component props
+3. **Context Usage**: Use React context for shared state
+4. **CSS Management**: Use CSS modules or Tailwind for styling
+5. **Accessibility**: Ensure components are accessible with proper ARIA attributes
+6. **Loading States**: Implement skeleton loaders for all data fetching
+7. **Error Handling**: Show meaningful error messages to users
+
+Example product card component:
+
+```tsx
+import { Product } from "@medusajs/medusa"
+import Image from "next/image"
+import Link from "next/link"
+import { formatPrice } from "../../utils/prices"
+
+interface ProductCardProps {
+  product: Product
+}
+
+const ProductCard = ({ product }: ProductCardProps) => {
+  const { title, thumbnail, variants, handle } = product
+  const price = variants[0]?.prices[0]
+  
+  return (
+    <Link href={`/products/${handle}`}>
+      <a className="group">
+        <div className="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden">
+          {thumbnail ? (
+            <Image
+              src={thumbnail}
+              alt={title}
+              width={300}
+              height={300}
+              objectFit="cover"
+              className="group-hover:scale-105 transition-transform duration-200"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200" />
+          )}
+        </div>
+        <h3 className="mt-2 text-sm text-gray-700">{title}</h3>
+        {price && (
+          <p className="mt-1 font-medium">
+            {formatPrice(price.amount, price.currency_code)}
+          </p>
+        )}
+      </a>
+    </Link>
+  )
+}
+
+export default ProductCard
+``` 

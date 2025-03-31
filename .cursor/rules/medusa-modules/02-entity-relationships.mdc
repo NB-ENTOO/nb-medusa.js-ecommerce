@@ -1,0 +1,252 @@
+---
+description: Medusa.js entity relationships and data models
+globs: 
+alwaysApply: true
+---
+
+# 🔄 MEDUSA.JS ENTITY RELATIONSHIPS
+
+> This file details the entity relationships and data models in Medusa.js e-commerce platform.
+
+## 🚨 CORE ENTITY RELATIONSHIPS
+
+Medusa.js has a rich data model with complex relationships between entities. Understanding these relationships is crucial for effective development.
+
+### Product Hierarchy
+
+```
+Product
+ ├── Product Variants
+ │    └── Product Options
+ ├── Product Collections
+ ├── Product Tags
+ ├── Product Categories
+ ├── Product Images
+ └── Product Metadata
+```
+
+Key relationships:
+- **Product → Variants (1:N)**: A product can have multiple variants (e.g., sizes, colors)
+- **Variant → Options (1:N)**: Each variant has specific option values (e.g., "Size: Large")
+- **Product → Collections (N:N)**: Products can belong to multiple collections
+- **Product → Categories (N:N)**: Products can be in multiple categories
+- **Product → Tags (N:N)**: Products can have multiple tags for filtering/searching
+- **Product → Images (1:N)**: Products can have multiple images
+
+### Order Processing
+
+```
+Order
+ ├── Line Items
+ │    └── Product Variants
+ ├── Shipping Methods
+ ├── Payment Sessions
+ │    └── Payment Providers
+ ├── Fulfillments
+ ├── Returns
+ ├── Discounts
+ ├── Gift Cards
+ └── Customer
+```
+
+Key relationships:
+- **Order → Line Items (1:N)**: Orders contain multiple line items
+- **Line Item → Variant (N:1)**: Line items reference product variants
+- **Order → Shipping Methods (1:N)**: Orders can have multiple shipping methods
+- **Order → Payment Sessions (1:N)**: Orders can have multiple payment sessions
+- **Order → Fulfillments (1:N)**: Orders can be fulfilled in multiple shipments
+- **Order → Returns (1:N)**: Parts of an order can be returned
+- **Order → Customer (N:1)**: Orders belong to a customer
+
+### Customer Management
+
+```
+Customer
+ ├── Customer Groups
+ ├── Addresses
+ ├── Orders
+ └── Authentication
+```
+
+Key relationships:
+- **Customer → Groups (N:N)**: Customers can belong to multiple groups
+- **Customer → Addresses (1:N)**: Customers can have multiple addresses
+- **Customer → Orders (1:N)**: Customers can have multiple orders
+
+### Price Management
+
+```
+Price List
+ ├── Money Amounts
+ │    └── Currency Codes
+ └── Product Variants
+```
+
+Key relationships:
+- **Price List → Money Amounts (1:N)**: Price lists contain multiple price points
+- **Money Amount → Variant (N:1)**: Price points reference product variants
+- **Money Amount → Currency (N:1)**: Price points are defined for specific currencies
+
+### Discount System
+
+```
+Discount
+ ├── Discount Conditions
+ │    ├── Products
+ │    ├── Product Types
+ │    ├── Product Collections
+ │    ├── Product Tags
+ │    ├── Customer Groups
+ │    └── Discount Rules
+ └── Discount Rules
+      ├── Percentage
+      ├── Fixed Amount
+      └── Free Shipping
+```
+
+Key relationships:
+- **Discount → Conditions (1:N)**: Discounts have conditions determining applicability
+- **Discount → Rules (1:1)**: Discounts have rules determining calculation method
+
+## 🚨 ENTITY DIAGRAMS
+
+### Product Entity
+
+```typescript
+interface Product {
+  id: string
+  title: string
+  subtitle: string | null
+  description: string | null
+  handle: string | null
+  is_giftcard: boolean
+  status: ProductStatus
+  thumbnail: string | null
+  profile_id: string
+  weight: number | null
+  length: number | null
+  height: number | null
+  width: number | null
+  hs_code: string | null
+  origin_country: string | null
+  mid_code: string | null
+  material: string | null
+  collection_id: string | null
+  collection: ProductCollection | null
+  type_id: string | null
+  type: ProductType | null
+  tags: ProductTag[]
+  discountable: boolean
+  external_id: string | null
+  metadata: Record<string, unknown> | null
+  variants: ProductVariant[]
+  options: ProductOption[]
+  categories: ProductCategory[]
+  images: Image[]
+  created_at: Date
+  updated_at: Date
+  deleted_at: Date | null
+}
+```
+
+### Order Entity
+
+```typescript
+interface Order {
+  id: string
+  status: OrderStatus
+  fulfillment_status: FulfillmentStatus
+  payment_status: PaymentStatus
+  display_id: number
+  cart_id: string | null
+  cart: Cart | null
+  customer_id: string | null
+  customer: Customer | null
+  email: string
+  billing_address_id: string | null
+  billing_address: Address | null
+  shipping_address_id: string | null
+  shipping_address: Address | null
+  region_id: string
+  region: Region
+  currency_code: string
+  currency: Currency
+  tax_rate: number | null
+  discounts: Discount[]
+  gift_cards: GiftCard[]
+  shipping_methods: ShippingMethod[]
+  payments: Payment[]
+  fulfillments: Fulfillment[]
+  returns: Return[]
+  claims: ClaimOrder[]
+  refunds: Refund[]
+  swaps: Swap[]
+  draft_order_id: string | null
+  draft_order: DraftOrder | null
+  items: LineItem[]
+  edits: OrderEdit[]
+  gift_card_transactions: GiftCardTransaction[]
+  canceled_at: Date | null
+  no_notification: boolean | null
+  idempotency_key: string | null
+  external_id: string | null
+  sales_channel_id: string | null
+  sales_channel: SalesChannel | null
+  shipping_total: number
+  discount_total: number
+  tax_total: number | null
+  refunded_total: number
+  total: number
+  subtotal: number
+  paid_total: number
+  refundable_amount: number
+  gift_card_total: number
+  gift_card_tax_total: number
+  metadata: Record<string, unknown> | null
+  created_at: Date
+  updated_at: Date
+}
+```
+
+### Customer Entity
+
+```typescript
+interface Customer {
+  id: string
+  email: string
+  first_name: string | null
+  last_name: string | null
+  billing_address_id: string | null
+  billing_address: Address | null
+  shipping_addresses: Address[]
+  password_hash: string | null
+  phone: string | null
+  has_account: boolean
+  orders: Order[]
+  groups: CustomerGroup[]
+  metadata: Record<string, unknown> | null
+  created_at: Date
+  updated_at: Date
+  deleted_at: Date | null
+}
+```
+
+## 🚨 IMPORTANT RELATIONSHIPS TO MAINTAIN
+
+When implementing new features or modifying existing ones, always ensure these critical relationships are preserved:
+
+1. **Product → Variants → Options**: The product hierarchy must remain intact
+2. **Order → Line Items → Variants**: Orders must correctly reference products
+3. **Customer → Orders**: Customer order history must be maintained
+4. **Price Lists → Money Amounts → Variants**: Pricing must be properly associated
+5. **Discount Conditions → Entities**: Discount rules must properly apply based on conditions
+
+## 🚨 SCHEMA EVOLUTION PRACTICES
+
+When evolving the database schema:
+
+1. **Use Migrations**: Always create proper migration files
+2. **Backward Compatibility**: Ensure changes don't break existing data
+3. **Transactional Safety**: Migrations should be transactionally safe
+4. **Indexing Strategy**: Consider performance implications of schema changes
+5. **Relationship Integrity**: Maintain foreign key constraints correctly 
